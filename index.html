@@ -1,0 +1,1257 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora (3 partes) — Peso/Gramatura/Espessura (mm) - PE</title>
+  <style>
+    :root{
+      --bg-0:#0b1020;
+      --bg-1:#0a1633;
+      --card:#0f1b3d;
+      --text:#eaf0ff;
+      --muted:#b7c3e6;
+      --line:rgba(255,255,255,.14);
+      --line2:rgba(255,255,255,.10);
+      --shadow: 0 16px 50px rgba(0,0,0,.35);
+      --radius:18px;
+
+      --a:#7c3aed; /* purple */
+      --b:#06b6d4; /* cyan */
+      --c:#22c55e; /* green */
+      --amber:#f59e0b;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 12% 10%, rgba(124,58,237,.35), transparent 55%),
+        radial-gradient(900px 600px at 88% 20%, rgba(6,182,212,.30), transparent 55%),
+        radial-gradient(1000px 700px at 55% 105%, rgba(34,197,94,.20), transparent 58%),
+        linear-gradient(180deg, var(--bg-0), var(--bg-1));
+      overflow-x:hidden;
+    }
+
+    .wrap{max-width:1120px;margin:0 auto;padding:18px 14px 28px}
+    @media (min-width: 980px){
+      .wrap{padding:22px 18px 34px}
+    }
+
+    header{
+      
+      background: rgba(11,16,32,.72);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line2);
+    }
+    header .wrap{padding-top:14px;padding-bottom:14px}
+    .titleRow{display:flex;flex-direction:column;gap:10px}
+    h1{
+      margin:0;
+      font-size:1.12rem;
+      letter-spacing:-.25px;
+      line-height:1.15;
+      overflow-wrap:anywhere;
+    }
+    @media (min-width: 980px){
+      h1{font-size:1.35rem}
+      .titleRow{flex-direction:row;align-items:flex-end;justify-content:space-between}
+    }
+    .sub{
+      margin:0;color:var(--muted);font-size:.93rem;line-height:1.35;
+      overflow-wrap:anywhere;
+    }
+
+    .chips{display:flex;flex-wrap:wrap;gap:8px;max-width:100%}
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      font-size:.84rem;color:var(--text);
+      max-width:100%;
+    }
+    .dot{width:10px;height:10px;border-radius:999px;flex:0 0 auto}
+    .dot.p{background:linear-gradient(180deg,var(--a),#a78bfa)}
+    .dot.c{background:linear-gradient(180deg,var(--b),#67e8f9)}
+    .dot.g{background:linear-gradient(180deg,var(--c),#86efac)}
+    .dot.a{background:linear-gradient(180deg,var(--amber),#fcd34d)}
+    .chip b{font-weight:850}
+
+    main .wrap{padding-top:16px}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
+    @media (min-width: 980px){ .grid{grid-template-columns:1fr 1fr 1fr} }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:
+        radial-gradient(600px 220px at 20% 0%, rgba(255,255,255,.07), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)),
+        var(--card);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      min-width:0;
+    }
+    .cardHead{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line2);
+      display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+      min-width:0;
+    }
+    .cardHead h2{margin:0;font-size:1.05rem;letter-spacing:-.2px;overflow-wrap:anywhere}
+    .pill{
+      display:inline-flex;align-items:center;
+      padding:5px 10px;border-radius:999px;
+      font-size:.82rem;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      white-space:nowrap;
+      flex:0 0 auto;
+    }
+    .cardBody{padding:14px}
+
+    .fieldset{
+      border:1px solid var(--line2);
+      border-radius:16px;
+      padding:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      min-width:0;
+    }
+    .fieldset + .fieldset{margin-top:12px}
+    .fieldsetTitle{
+      display:flex;align-items:center;gap:10px;min-width:0;
+      margin:0 0 8px;
+      font-size:.88rem;
+      font-weight:900;
+      color:var(--text);
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 9px;border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line2);
+      font-size:.78rem;font-weight:800;color:var(--muted);
+      max-width:100%;
+    }
+    .badge .dot{width:8px;height:8px}
+
+    label{
+      display:block;
+      margin-top:10px;
+      font-weight:850;
+      font-size:.92rem;
+      color:var(--text);
+      overflow-wrap:anywhere;
+    }
+    label .opt{color:var(--muted);font-weight:700}
+    input,select,button{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      margin-top:6px;
+      font-size:1rem;
+      outline:none;
+      color:var(--text);
+      background: rgba(255,255,255,.06);
+      min-width:0;
+    }
+    select{
+      appearance:none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(234,240,255,.85) 50%),
+        linear-gradient(135deg, rgba(234,240,255,.85) 50%, transparent 50%);
+      background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat:no-repeat;
+      padding-right: 34px;
+    }
+    input::placeholder{color:rgba(183,195,230,.7)}
+    input:focus,select:focus{
+      border-color: rgba(124,58,237,.7);
+      box-shadow: 0 0 0 4px rgba(124,58,237,.20);
+    }
+    .hint{margin:8px 0 0;color:var(--muted);font-size:.86rem;line-height:1.35}
+    .row{display:grid;grid-template-columns:1fr;gap:10px;min-width:0}
+    @media (min-width: 560px){ .row.two{grid-template-columns:1fr 1fr} }
+
+    .btnRow{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+    @media (min-width: 560px){ .btnRow{grid-template-columns:1fr 1fr} }
+    button{cursor:pointer;touch-action:manipulation;font-weight:900;letter-spacing:.2px;user-select:none}
+    .btnPrimary{
+      background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(6,182,212,.85));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 14px 30px rgba(124,58,237,.18);
+    }
+    .btnPrimary:active{transform: translateY(1px)}
+    .btnSecondary{background: rgba(255,255,255,.06);border: 1px solid var(--line);color: var(--text)}
+
+    .out{
+      margin-top:12px;
+      border-radius:16px;
+      padding:12px;
+      border:1px solid var(--line);
+      background:
+        radial-gradient(600px 200px at 10% 0%, rgba(6,182,212,.18), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      overflow-wrap:anywhere;
+      min-width:0;
+    }
+    .kpi{display:grid;gap:7px;margin-top:10px}
+    .kpiLine{
+      display:flex;justify-content:space-between;gap:14px;
+      padding:10px 10px;border-radius:14px;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.07);
+      min-width:0;
+    }
+    .kpiLine span{color:var(--muted);min-width:0;overflow-wrap:anywhere}
+    .kpiLine b{white-space:nowrap;flex:0 0 auto}
+    .warn{
+      margin-top:10px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(245,158,11,.35);
+      background: rgba(245,158,11,.14);
+      color: #ffe4b6;
+      font-size:.92rem;
+      overflow-wrap:anywhere;
+      min-width:0;
+    }
+
+    .summary{
+      margin-top:16px;
+      border-radius:20px;
+      padding:14px;
+      border:1px solid rgba(255,255,255,.18);
+      background:
+        radial-gradient(900px 240px at 20% 0%, rgba(34,197,94,.18), transparent 60%),
+        radial-gradient(900px 240px at 85% 0%, rgba(124,58,237,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .summary h2{margin:0 0 10px;font-size:1.12rem;letter-spacing:-.2px}
+    .tableWrap{
+      width:100%;
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.12);
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:640px;
+      font-size:.98rem;
+    }
+    th,td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      text-align:left;
+      white-space:nowrap;
+    }
+    th{font-weight:950;color:var(--text)}
+    td{color:rgba(234,240,255,.95)}
+    .right{text-align:right}
+    tfoot th, tfoot td{border-bottom:none}
+    .totalPill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 12px;border-radius:999px;
+      background: rgba(6,182,212,.18);
+      border:1px solid rgba(6,182,212,.35);
+      font-weight:950;
+    }
+    .note{margin-top:10px;color:var(--muted);font-size:.9rem;line-height:1.35;overflow-wrap:anywhere}
+
+    
+
+    /* Checkbox (pretty) */
+    .toggleRow{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:10px 12px;border-radius:16px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      margin-bottom:12px;
+      min-width:0;
+    }
+    .toggleRow .left{
+      display:flex;align-items:center;gap:10px;min-width:0;
+    }
+    .toggleRow .title{
+      font-weight:950; letter-spacing:-.1px; color:var(--text);
+      overflow-wrap:anywhere;
+    }
+    .toggleRow .desc{
+      color:var(--muted); font-size:.86rem; line-height:1.25;
+      overflow-wrap:anywhere;
+    }
+    .switch{
+      position:relative; width:54px; height:32px; flex:0 0 auto;
+    }
+    .switch input{display:none}
+    .slider{
+      position:absolute; inset:0;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:999px;
+      transition:.2s;
+    }
+    .slider:before{
+      content:"";
+      position:absolute; width:26px; height:26px; left:3px; top:2px;
+      border-radius:999px;
+      background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(6,182,212,.85));
+      box-shadow: 0 8px 18px rgba(0,0,0,.35);
+      transition:.2s;
+    }
+    .switch input:checked + .slider{
+      background: rgba(34,197,94,.16);
+      border-color: rgba(34,197,94,.35);
+    }
+    .switch input:checked + .slider:before{
+      transform: translateX(22px);
+      background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(6,182,212,.75));
+    }
+    .subCard{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.08);
+      border-radius:16px;
+      padding:12px;
+      min-width:0;
+    }
+    .subCardTitle{
+      margin:0 0 8px;
+      font-weight:950;
+      letter-spacing:-.1px;
+      display:flex;align-items:center;gap:10px;
+    }
+  
+    input:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+  
+    /* Badge PE/PP (destaque animado) */
+    .matBadge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:72px;
+      height:38px;
+      padding:0 14px;
+      border-radius:999px;
+      font-weight:1000;
+      letter-spacing:.6px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 10px 26px rgba(0,0,0,.35);
+      position:relative;
+      overflow:hidden;
+      user-select:none;
+    }
+    .matBadge::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: conic-gradient(from 180deg, rgba(124,58,237,.0), rgba(124,58,237,.65), rgba(6,182,212,.65), rgba(34,197,94,.65), rgba(124,58,237,.0));
+      filter: blur(10px);
+      opacity:.55;
+      animation: spinGlow 3.2s linear infinite;
+    }
+    .matBadge span{
+      position:relative;
+      z-index:1;
+      text-shadow: 0 8px 22px rgba(0,0,0,.45);
+    }
+    .matBadge.pe span{ color:#eaf0ff; }
+    .matBadge.pp span{ color:#eafff2; }
+
+    .matBadge.pe{
+      background: radial-gradient(180px 60px at 20% 30%, rgba(124,58,237,.28), transparent 60%),
+                  radial-gradient(160px 60px at 90% 40%, rgba(6,182,212,.18), transparent 55%),
+                  rgba(255,255,255,.06);
+      border-color: rgba(124,58,237,.35);
+    }
+    .matBadge.pp{
+      background: radial-gradient(180px 60px at 20% 30%, rgba(34,197,94,.26), transparent 60%),
+                  radial-gradient(160px 60px at 90% 40%, rgba(6,182,212,.18), transparent 55%),
+                  rgba(255,255,255,.06);
+      border-color: rgba(34,197,94,.35);
+    }
+
+    .matBadge.pop{
+      animation: badgePop .55s ease-out both;
+    }
+    .matBadge.flash::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.22) 45%, transparent 70%);
+      transform: translateX(-120%);
+      animation: sweep .65s ease-out both;
+    }
+
+    @keyframes spinGlow{
+      to{ transform: rotate(360deg); }
+    }
+    @keyframes badgePop{
+      0%{ transform: scale(.90); filter: brightness(.92); }
+      45%{ transform: scale(1.06); filter: brightness(1.08); }
+      100%{ transform: scale(1.00); filter: brightness(1.00); }
+    }
+    @keyframes sweep{
+      to{ transform: translateX(120%); }
+    }
+
+    /* Ajuste no toggleRow para caber badge sem estourar */
+    .toggleRow{
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
+    .toggleRow .rightSide{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
+    }
+
+  </style>
+
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="titleRow">
+        <div style="min-width:0">
+          <h1>Calculadora (3 partes) — Peso, Gramatura e Espessura (mm)</h1>
+          <p class="sub">Preencha <b>qualquer 1</b>: <b>Peso</b> (g) <i>ou</i> <b>Gramatura</b> (g/m²) <i>ou</i> <b>Espessura</b> (mm). O resto é calculado. Na <b>Tarja</b>, você pode marcar <b>Válvula deslocada</b> para calcular as duas tarjas separadas.</p>
+        </div>
+        <div class="chips" aria-label="Informações rápidas">
+          <span class="chip"><span class="dot p"></span><span>Densidade padrão: <b>922 kg/m³</b></span></span>
+          <span class="chip"><span class="dot c"></span><span>Conversão: <b>1 mm = 1000 µm</b></span></span>
+          <span class="chip"><span class="dot g"></span><span>Atalho: <b>esp(mm) = gram / dens</b></span></span>
+          <span class="chip"><span class="dot a"></span><span>Tarja: <b>2×</b> ou <b>1+1</b></span></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="grid">
+        <!-- CORPO -->
+        <section class="card" data-part="corpo">
+          <div class="cardHead"><h2>Corpo</h2><span class="pill">1×</span></div>
+          <div class="cardBody">
+            <div class="toggleRow" style="margin-top:0">
+              <div class="left">
+                <div>
+                  <div class="title">Modo de material</div>
+                  <div class="desc">Desligado: <b>PE</b> (densidade obrigatória). Ligado: <b>Sacaria (PP)</b> (densidade opcional se você tiver a gramatura/peso).</div>
+                </div>
+              </div>
+              
+              <div class="rightSide">
+                <div class="matBadge pe" id="materialBadge" aria-live="polite" title="Material selecionado">
+                  <span>PE</span>
+                </div>
+                <label class="switch" title="Alternar material">
+                  <input type="checkbox" id="materialSacaria">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="fieldset">
+              <p class="fieldsetTitle">Entrada <span class="badge"><span class="dot p"></span>preencha 1 dos 3</span></p>
+              <div class="row two">
+                <div>
+                  <label>Peso (g) <span class="opt">(opcional)</span></label>
+                  <input class="peso" type="number" step="0.01" min="0" placeholder="Ex: 120" inputmode="decimal" />
+                </div>
+                <div>
+                  <label>Gramatura (g/m²) <span class="opt">(opcional)</span></label>
+                  <input class="gram" type="number" step="0.01" min="0" placeholder="Ex: 156" inputmode="decimal" />
+                </div>
+              </div>
+              <div class="row two">
+                <div>
+                  <label>Espessura (mm) <span class="opt">(opcional)</span></label>
+                  <input class="esp" type="number" step="0.001" min="0" placeholder="Ex: 0.169" inputmode="decimal" />
+                </div>
+                <div>
+                  <label>Densidade (kg/m³)</label>
+                  <input class="dens" type="number" step="1" min="1" value="922" inputmode="numeric" />
+                  <p class="hint">PE padrão: 922 kg/m³</p>
+                </div>
+              </div>
+              <p class="hint">Se preencher mais de um, a prioridade é <b>Peso</b> → <b>Gramatura</b> → <b>Espessura</b> (e aparece alerta se divergir).</p>
+            </div>
+
+            <div class="fieldset">
+              <p class="fieldsetTitle">Dimensões do corte <span class="badge"><span class="dot c"></span>obrigatório</span></p>
+              <label>Unidade</label>
+              <select class="unidade">
+                <option value="cm" selected>cm</option>
+                <option value="mm">mm</option>
+                <option value="m">m</option>
+              </select>
+              <div class="row two">
+                <div>
+                  <label>Largura</label>
+                  <input class="largura" type="number" step="0.01" min="0" placeholder="Ex: 70" inputmode="decimal" />
+                </div>
+                <div>
+                  <label>Comprimento</label>
+                  <input class="comprimento" type="number" step="0.01" min="0" placeholder="Ex: 110" inputmode="decimal" />
+                </div>
+              </div>
+            </div>
+
+            <div class="btnRow">
+              <button class="btnPrimary btn">Calcular</button>
+              <button class="btnSecondary limpar" type="button">Limpar</button>
+            </div>
+
+            <div class="out saida" style="display:none;"></div>
+            <div class="warn aviso" style="display:none;"></div>
+          </div>
+        </section>
+
+        <!-- TARJA -->
+        <section class="card" data-part="tarja">
+          <div class="cardHead"><h2>Tarja</h2><span class="pill" id="tarjaPill">2× no total</span></div>
+          <div class="cardBody">
+
+            <div class="toggleRow">
+              <div class="left">
+                <div>
+                  <div class="title">Válvula deslocada</div>
+                  <div class="desc">Se ligado, calcule <b>Tarja 1</b> e <b>Tarja 2</b> separadas (sem 2×).</div>
+                </div>
+              </div>
+              <label class="switch" title="Alternar modo">
+                <input type="checkbox" id="valvulaDeslocada">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <!-- MODO NORMAL (1 tarja, entra 2x) -->
+            <div id="tarjaSingle">
+              <div class="fieldset">
+                <p class="fieldsetTitle">Entrada <span class="badge"><span class="dot p"></span>preencha 1 dos 3</span></p>
+                <div class="row two">
+                  <div>
+                    <label>Peso (g) <span class="opt">(opcional)</span></label>
+                    <input class="peso" type="number" step="0.01" min="0" placeholder="Ex: 18" inputmode="decimal" />
+                  </div>
+                  <div>
+                    <label>Gramatura (g/m²) <span class="opt">(opcional)</span></label>
+                    <input class="gram" type="number" step="0.01" min="0" placeholder="Ex: 110" inputmode="decimal" />
+                  </div>
+                </div>
+                <div class="row two">
+                  <div>
+                    <label>Espessura (mm) <span class="opt">(opcional)</span></label>
+                    <input class="esp" type="number" step="0.001" min="0" placeholder="Ex: 0.119" inputmode="decimal" />
+                  </div>
+                  <div>
+                    <label>Densidade (kg/m³)</label>
+                    <input class="dens" type="number" step="1" min="1" value="922" inputmode="numeric" />
+                    <p class="hint">Modo padrão: Tarja entra como <b>2×</b> no resumo.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fieldset">
+                <p class="fieldsetTitle">Dimensões do corte <span class="badge"><span class="dot c"></span>obrigatório</span></p>
+                <label>Unidade</label>
+                <select class="unidade">
+                  <option value="cm" selected>cm</option>
+                  <option value="mm">mm</option>
+                  <option value="m">m</option>
+                </select>
+                <div class="row two">
+                  <div>
+                    <label>Largura</label>
+                    <input class="largura" type="number" step="0.01" min="0" placeholder="Ex: 12" inputmode="decimal" />
+                  </div>
+                  <div>
+                    <label>Comprimento</label>
+                    <input class="comprimento" type="number" step="0.01" min="0" placeholder="Ex: 50" inputmode="decimal" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="btnRow">
+                <button class="btnPrimary btn">Calcular</button>
+                <button class="btnSecondary limpar" type="button">Limpar</button>
+              </div>
+
+              <div class="out saida" style="display:none;"></div>
+              <div class="warn aviso" style="display:none;"></div>
+            </div>
+
+            <!-- MODO DESLOCADO (Tarja 1 + Tarja 2) -->
+            <div id="tarjaSplit" style="display:none">
+              <div class="subCard" data-subpart="tarja1">
+                <div class="subCardTitle"><span class="dot a"></span> Tarja 1</div>
+
+                <div class="fieldset">
+                  <p class="fieldsetTitle">Entrada <span class="badge"><span class="dot p"></span>preencha 1 dos 3</span></p>
+                  <div class="row two">
+                    <div>
+                      <label>Peso (g) <span class="opt">(opcional)</span></label>
+                      <input class="peso" type="number" step="0.01" min="0" placeholder="Ex: 16" inputmode="decimal" />
+                    </div>
+                    <div>
+                      <label>Gramatura (g/m²) <span class="opt">(opcional)</span></label>
+                      <input class="gram" type="number" step="0.01" min="0" placeholder="Ex: 110" inputmode="decimal" />
+                    </div>
+                  </div>
+                  <div class="row two">
+                    <div>
+                      <label>Espessura (mm) <span class="opt">(opcional)</span></label>
+                      <input class="esp" type="number" step="0.001" min="0" placeholder="Ex: 0.119" inputmode="decimal" />
+                    </div>
+                    <div>
+                      <label>Densidade (kg/m³)</label>
+                      <input class="dens" type="number" step="1" min="1" value="922" inputmode="numeric" />
+                      <p class="hint">Tarja 1 entra <b>1×</b> no resumo.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fieldset">
+                  <p class="fieldsetTitle">Dimensões do corte <span class="badge"><span class="dot c"></span>obrigatório</span></p>
+                  <label>Unidade</label>
+                  <select class="unidade">
+                    <option value="cm" selected>cm</option>
+                    <option value="mm">mm</option>
+                    <option value="m">m</option>
+                  </select>
+                  <div class="row two">
+                    <div>
+                      <label>Largura</label>
+                      <input class="largura" type="number" step="0.01" min="0" placeholder="Ex: 12" inputmode="decimal" />
+                    </div>
+                    <div>
+                      <label>Comprimento</label>
+                      <input class="comprimento" type="number" step="0.01" min="0" placeholder="Ex: 50" inputmode="decimal" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="btnRow">
+                  <button class="btnPrimary btn">Calcular</button>
+                  <button class="btnSecondary limpar" type="button">Limpar</button>
+                </div>
+
+                <div class="out saida" style="display:none;"></div>
+                <div class="warn aviso" style="display:none;"></div>
+              </div>
+
+              <div style="height:12px"></div>
+
+              <div class="subCard" data-subpart="tarja2">
+                <div class="subCardTitle"><span class="dot a"></span> Tarja 2</div>
+
+                <div class="fieldset">
+                  <p class="fieldsetTitle">Entrada <span class="badge"><span class="dot p"></span>preencha 1 dos 3</span></p>
+                  <div class="row two">
+                    <div>
+                      <label>Peso (g) <span class="opt">(opcional)</span></label>
+                      <input class="peso" type="number" step="0.01" min="0" placeholder="Ex: 20" inputmode="decimal" />
+                    </div>
+                    <div>
+                      <label>Gramatura (g/m²) <span class="opt">(opcional)</span></label>
+                      <input class="gram" type="number" step="0.01" min="0" placeholder="Ex: 110" inputmode="decimal" />
+                    </div>
+                  </div>
+                  <div class="row two">
+                    <div>
+                      <label>Espessura (mm) <span class="opt">(opcional)</span></label>
+                      <input class="esp" type="number" step="0.001" min="0" placeholder="Ex: 0.119" inputmode="decimal" />
+                    </div>
+                    <div>
+                      <label>Densidade (kg/m³)</label>
+                      <input class="dens" type="number" step="1" min="1" value="922" inputmode="numeric" />
+                      <p class="hint">Tarja 2 entra <b>1×</b> no resumo.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fieldset">
+                  <p class="fieldsetTitle">Dimensões do corte <span class="badge"><span class="dot c"></span>obrigatório</span></p>
+                  <label>Unidade</label>
+                  <select class="unidade">
+                    <option value="cm" selected>cm</option>
+                    <option value="mm">mm</option>
+                    <option value="m">m</option>
+                  </select>
+                  <div class="row two">
+                    <div>
+                      <label>Largura</label>
+                      <input class="largura" type="number" step="0.01" min="0" placeholder="Ex: 12" inputmode="decimal" />
+                    </div>
+                    <div>
+                      <label>Comprimento</label>
+                      <input class="comprimento" type="number" step="0.01" min="0" placeholder="Ex: 50" inputmode="decimal" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="btnRow">
+                  <button class="btnPrimary btn">Calcular</button>
+                  <button class="btnSecondary limpar" type="button">Limpar</button>
+                </div>
+
+                <div class="out saida" style="display:none;"></div>
+                <div class="warn aviso" style="display:none;"></div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- VÁLVULA -->
+        <section class="card" data-part="valvula">
+          <div class="cardHead"><h2>Válvula</h2><span class="pill">1×</span></div>
+          <div class="cardBody">
+            <div class="fieldset">
+              <p class="fieldsetTitle">Entrada <span class="badge"><span class="dot p"></span>preencha 1 dos 3</span></p>
+              <div class="row two">
+                <div>
+                  <label>Peso (g) <span class="opt">(opcional)</span></label>
+                  <input class="peso" type="number" step="0.01" min="0" placeholder="Ex: 7" inputmode="decimal" />
+                </div>
+                <div>
+                  <label>Gramatura (g/m²) <span class="opt">(opcional)</span></label>
+                  <input class="gram" type="number" step="0.01" min="0" placeholder="Ex: 140" inputmode="decimal" />
+                </div>
+              </div>
+              <div class="row two">
+                <div>
+                  <label>Espessura (mm) <span class="opt">(opcional)</span></label>
+                  <input class="esp" type="number" step="0.001" min="0" placeholder="Ex: 0.152" inputmode="decimal" />
+                </div>
+                <div>
+                  <label>Densidade (kg/m³)</label>
+                  <input class="dens" type="number" step="1" min="1" value="922" inputmode="numeric" />
+                  <p class="hint">PE padrão: 922 kg/m³</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="fieldset">
+              <p class="fieldsetTitle">Dimensões do corte <span class="badge"><span class="dot c"></span>obrigatório</span></p>
+              <label>Unidade</label>
+              <select class="unidade">
+                <option value="cm" selected>cm</option>
+                <option value="mm">mm</option>
+                <option value="m">m</option>
+              </select>
+              <div class="row two">
+                <div>
+                  <label>Largura</label>
+                  <input class="largura" type="number" step="0.01" min="0" placeholder="Ex: 10" inputmode="decimal" />
+                </div>
+                <div>
+                  <label>Comprimento</label>
+                  <input class="comprimento" type="number" step="0.01" min="0" placeholder="Ex: 30" inputmode="decimal" />
+                </div>
+              </div>
+            </div>
+
+            <div class="btnRow">
+              <button class="btnPrimary btn">Calcular</button>
+              <button class="btnSecondary limpar" type="button">Limpar</button>
+            </div>
+
+            <div class="out saida" style="display:none;"></div>
+            <div class="warn aviso" style="display:none;"></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="summary" aria-live="polite">
+        <h2>Resumo do Saco (somatório)</h2>
+        <div class="tableWrap" role="region" aria-label="Tabela de resumo" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th>Parte</th>
+                <th class="right">Peso (g)</th>
+                <th class="right">Multiplicador</th>
+                <th class="right">Peso no total (g)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr id="row-corpo">
+                <td>Corpo</td>
+                <td class="right" id="sum-corpo">—</td>
+                <td class="right">1×</td>
+                <td class="right" id="sum-corpo-total">—</td>
+              </tr>
+
+              <!-- Tarja normal -->
+              <tr id="row-tarja">
+                <td>Tarja</td>
+                <td class="right" id="sum-tarja">—</td>
+                <td class="right" id="sum-tarja-mult">2×</td>
+                <td class="right" id="sum-tarja-total">—</td>
+              </tr>
+
+              <!-- Tarja split -->
+              <tr id="row-tarja1" style="display:none">
+                <td>Tarja 1</td>
+                <td class="right" id="sum-tarja1">—</td>
+                <td class="right">1×</td>
+                <td class="right" id="sum-tarja1-total">—</td>
+              </tr>
+              <tr id="row-tarja2" style="display:none">
+                <td>Tarja 2</td>
+                <td class="right" id="sum-tarja2">—</td>
+                <td class="right">1×</td>
+                <td class="right" id="sum-tarja2-total">—</td>
+              </tr>
+
+              <tr id="row-valvula">
+                <td>Válvula</td>
+                <td class="right" id="sum-valvula">—</td>
+                <td class="right">1×</td>
+                <td class="right" id="sum-valvula-total">—</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>Total do saco</th>
+                <th></th><th></th>
+                <th class="right" id="sum-total"><span class="totalPill"><span class="dot c"></span><b>—</b></span></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="note">O resumo usa o <b>peso calculado</b> (mesmo se você informar gramatura/espessura). No modo <b>Válvula deslocada</b>, as tarjas são somadas individualmente (Tarja 1 + Tarja 2).</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Estados (peso calculado por parte)
+    const state = {
+      corpo: null,
+      valvula: null,
+      tarja: null,   // modo normal
+      tarja1: null,  // modo deslocado
+      tarja2: null   // modo deslocado
+    };
+
+    function toMeters(v, unidade){
+      if (!isFinite(v)) return NaN;
+      if (unidade === "mm") return v / 1000;
+      if (unidade === "cm") return v / 100;
+      return v; // m
+    }
+
+    function fmt(n, d=2){
+      return n.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+    }
+
+    function near(a, b, relTol=0.03){
+      if (!isFinite(a) || !isFinite(b) || a<=0 || b<=0) return true;
+      const diff = Math.abs(a-b);
+      const scale = Math.max(a,b);
+      return (diff/scale) <= relTol;
+    }
+
+    function setText(id, text){ document.getElementById(id).textContent = text; }
+
+    function updateSummary(){
+      const deslocada = document.getElementById("valvulaDeslocada").checked;
+      let total = 0;
+
+      
+      // Corpo
+      const materialSacaria = document.getElementById("materialSacaria")?.checked === true;
+      if (state.corpo?.peso_g > 0){
+        const v = state.corpo.peso_g;
+        const multCorpo = materialSacaria ? 2 : 1;
+        const vTotal = v * multCorpo;
+        total += vTotal;
+        setText("sum-corpo", fmt(v,2));
+        setText("sum-corpo-total", fmt(vTotal,2));
+        document.querySelector("#row-corpo td:nth-child(3)").textContent = multCorpo + "×";
+      } else {
+        setText("sum-corpo","—"); 
+        setText("sum-corpo-total","—");
+        document.querySelector("#row-corpo td:nth-child(3)").textContent = "1×";
+      }
+
+      // Válvula
+
+      if (state.valvula?.peso_g > 0){
+        const v = state.valvula.peso_g;
+        total += v;
+        setText("sum-valvula", fmt(v,2));
+        setText("sum-valvula-total", fmt(v,2));
+      } else {
+        setText("sum-valvula","—"); setText("sum-valvula-total","—");
+      }
+
+      // Tarja: dois modos
+      const rowTarja = document.getElementById("row-tarja");
+      const rowTarja1 = document.getElementById("row-tarja1");
+      const rowTarja2 = document.getElementById("row-tarja2");
+
+      if (!deslocada){
+        rowTarja.style.display = "";
+        rowTarja1.style.display = "none";
+        rowTarja2.style.display = "none";
+
+        const mult = 2;
+        setText("sum-tarja-mult", "2×");
+        if (state.tarja?.peso_g > 0){
+          const v = state.tarja.peso_g;
+          const vt = v * mult;
+          total += vt;
+          setText("sum-tarja", fmt(v,2));
+          setText("sum-tarja-total", fmt(vt,2));
+        } else {
+          setText("sum-tarja","—"); setText("sum-tarja-total","—");
+        }
+      } else {
+        rowTarja.style.display = "none";
+        rowTarja1.style.display = "";
+        rowTarja2.style.display = "";
+
+        // Tarja 1
+        if (state.tarja1?.peso_g > 0){
+          const v1 = state.tarja1.peso_g;
+          total += v1;
+          setText("sum-tarja1", fmt(v1,2));
+          setText("sum-tarja1-total", fmt(v1,2));
+        } else {
+          setText("sum-tarja1","—"); setText("sum-tarja1-total","—");
+        }
+
+        // Tarja 2
+        if (state.tarja2?.peso_g > 0){
+          const v2 = state.tarja2.peso_g;
+          total += v2;
+          setText("sum-tarja2", fmt(v2,2));
+          setText("sum-tarja2-total", fmt(v2,2));
+        } else {
+          setText("sum-tarja2","—"); setText("sum-tarja2-total","—");
+        }
+      }
+
+      const totalCell = document.getElementById("sum-total");
+      totalCell.innerHTML = total > 0
+        ? `<span class="totalPill"><span class="dot c"></span><b>${fmt(total, 2)} g</b></span>`
+        : `<span class="totalPill"><span class="dot c"></span><b>—</b></span>`;
+    }
+
+    // Cálculo genérico para qualquer "bloco calculável" (section.card ou div.subCard)
+    function calcBlock(block, key){
+      const peso_in = parseFloat(block.querySelector(".peso")?.value);
+      const gram_in = parseFloat(block.querySelector(".gram")?.value);
+      const esp_in  = parseFloat(block.querySelector(".esp")?.value);
+
+      const dens = parseFloat(block.querySelector(".dens")?.value);
+      const unidade = block.querySelector(".unidade")?.value;
+      const larg = parseFloat(block.querySelector(".largura")?.value);
+      const comp = parseFloat(block.querySelector(".comprimento")?.value);
+
+      const saida = block.querySelector(".saida");
+      const aviso = block.querySelector(".aviso");
+
+      aviso.style.display = "none";
+      aviso.innerHTML = "";
+
+      const L = toMeters(larg, unidade);
+      const C = toMeters(comp, unidade);
+
+      
+      const materialSacaria = document.getElementById("materialSacaria")?.checked === true;
+      // Regras:
+      // - PE: densidade é obrigatória (para manter consistência do projeto original).
+      // - Sacaria (PP): densidade pode ser opcional se você NÃO estiver usando espessura.
+      const needsDims = !(L > 0) || !(C > 0);
+
+      if (needsDims){
+        saida.style.display = "block";
+        saida.innerHTML = "Preencha as dimensões do corte com valores maiores que zero.";
+        state[key] = null;
+        updateSummary();
+        return;
+      }
+
+      // Se espessura foi informada, densidade é obrigatória (em qualquer modo)
+      const hasEspTmp = (esp_in > 0);
+
+      if (!(dens > 0)){
+        if (!materialSacaria){
+          saida.style.display = "block";
+          saida.innerHTML = "No modo PE, a densidade é obrigatória (ex: 922).";
+          state[key] = null;
+          updateSummary();
+          return;
+        }
+        if (hasEspTmp){
+          saida.style.display = "block";
+          saida.innerHTML = "Para usar a espessura, informe também a densidade.";
+          state[key] = null;
+          updateSummary();
+          return;
+        }
+        // Sacaria: sem densidade e sem espessura -> permitido (espessura ficará indisponível)
+      }
+
+      const area_m2 = L * C;
+      const hasPeso = (peso_in > 0);
+      const hasGram = (gram_in > 0);
+      const hasEsp  = (esp_in  > 0);
+
+      if (!hasPeso && !hasGram && !hasEsp){
+        saida.style.display = "block";
+        saida.innerHTML = "Preencha pelo menos um: Peso (g) OU Gramatura (g/m²) OU Espessura (mm).";
+        state[key] = null;
+        updateSummary();
+        return;
+      }
+
+      
+      let peso_g, gramatura, esp_mm;
+
+      // Prioridade: Peso -> Gramatura -> Espessura
+      if (hasPeso){
+        peso_g = peso_in;
+        gramatura = peso_g / area_m2;         // g/m²
+        // Espessura só se houver densidade
+        esp_mm = (dens > 0) ? (peso_g / (dens * area_m2)) : null;
+      } else if (hasGram){
+        gramatura = gram_in;
+        peso_g = gramatura * area_m2;         // g
+        esp_mm = (dens > 0) ? (gramatura / dens) : null;
+      } else {
+        // hasEsp -> aqui densidade já foi validada como obrigatória
+        esp_mm = esp_in;
+        gramatura = esp_mm * dens;            // g/m²
+        peso_g = gramatura * area_m2;         // g
+      }
+
+      // Divergência se 2+ campos preenchidos
+      const filledCount = (hasPeso?1:0) + (hasGram?1:0) + (hasEsp?1:0);
+      if (filledCount >= 2){
+        const checks = [];
+        if (hasPeso) checks.push({label:"Peso", given:peso_in, calc:peso_g, unit:"g", d:2});
+        if (hasGram) checks.push({label:"Gramatura", given:gram_in, calc:gramatura, unit:"g/m²", d:2});
+        if (hasEsp)  checks.push({label:"Espessura", given:esp_in, calc:esp_mm, unit:"mm", d:3});
+
+        const problems = checks
+          .filter(x => !near(x.given, x.calc))
+          .map(x => `• ${x.label}: informado <b>${fmt(x.given, x.d)} ${x.unit}</b> vs calculado <b>${fmt(x.calc, x.d)} ${x.unit}</b>`);
+
+        if (problems.length){
+          aviso.style.display = "block";
+          aviso.innerHTML = `<b>Atenção:</b> valores informados não batem (tolerância 3%).<br>${problems.join("<br>")}<br><span class="muted">Resultado segue a prioridade: Peso → Gramatura → Espessura.</span>`;
+        }
+      }
+
+      const esp_um = (esp_mm != null) ? (esp_mm * 1000) : null;
+
+      saida.style.display = "block";
+      saida.innerHTML = `
+        <b>Resultados</b>
+        <div class="kpi">
+          <div class="kpiLine"><span>Área do corte</span><b>${fmt(area_m2, 4)} m²</b></div>
+          <div class="kpiLine"><span>Peso calculado</span><b>${(key==="corpo" && materialSacaria) ? (fmt(peso_g*2, 2) + " g (×2 tubular)") : (fmt(peso_g, 2) + " g")}</b></div>
+          <div class="kpiLine"><span>Gramatura</span><b>${fmt(gramatura, 2)} g/m²</b></div>
+          <div class="kpiLine"><span>Espessura</span><b>${(esp_mm!=null)?fmt(esp_mm, 3)+" mm":"—"}</b></div>
+          <div class="kpiLine"><span>Espessura (referência)</span><b>${(esp_um!=null)?fmt(esp_um, 0)+" µm":"—"}</b></div>
+        </div>
+        <div style="margin-top:10px" class="muted">1 camada • densidade ${(dens>0)?fmt(dens,0)+" kg/m³":"— (opcional no modo Sacaria)"} </div>
+      `;
+
+      state[key] = { peso_g, gramatura, esp_mm, dens, area_m2 };
+      updateSummary();
+    }
+
+    function clearBlock(block, key){
+      block.querySelectorAll("input").forEach(i => {
+        if (i.classList.contains("dens")) i.value = "922";
+        else i.value = "";
+      });
+      const saida = block.querySelector(".saida");
+      const aviso = block.querySelector(".aviso");
+      if (saida){ saida.style.display="none"; saida.innerHTML=""; }
+      if (aviso){ aviso.style.display="none"; aviso.innerHTML=""; }
+      state[key] = null;
+      updateSummary();
+    }
+
+    function wireBlock(block, key){
+      const btn = block.querySelector(".btn");
+      const limpar = block.querySelector(".limpar");
+      if (btn) btn.addEventListener("click", () => calcBlock(block, key));
+      if (limpar) limpar.addEventListener("click", () => clearBlock(block, key));
+
+      // Auto refresh se já calculado
+      ["peso","gram","esp","dens","unidade","largura","comprimento"].forEach(cls => {
+        const el = block.querySelector("." + cls);
+        if (!el) return;
+        const ev = (el.tagName === "SELECT") ? "change" : "input";
+        el.addEventListener(ev, () => { if (state[key]) calcBlock(block, key); });
+      });
+    }
+
+    // Wire Corpo e Válvula
+    wireBlock(document.querySelector('section[data-part="corpo"]'), "corpo");
+    wireBlock(document.querySelector('section[data-part="valvula"]'), "valvula");
+
+    // Tarja (single block)
+    wireBlock(document.querySelector('#tarjaSingle'), "tarja");
+
+    // Tarja split blocks
+    document.querySelectorAll('#tarjaSplit .subCard').forEach(sc => {
+      const sub = sc.getAttribute("data-subpart"); // tarja1 / tarja2
+      wireBlock(sc, sub);
+    });
+
+    // Toggle Tarja mode
+    const chk = document.getElementById("valvulaDeslocada");
+    const tarjaSingle = document.getElementById("tarjaSingle");
+    const tarjaSplit = document.getElementById("tarjaSplit");
+    const tarjaPill = document.getElementById("tarjaPill");
+
+    function applyTarjaMode(){
+      const deslocada = chk.checked;
+      tarjaSingle.style.display = deslocada ? "none" : "block";
+      tarjaSplit.style.display = deslocada ? "block" : "none";
+      tarjaPill.textContent = deslocada ? "1 + 1 (separado)" : "2× no total";
+
+      // Se mudou pro modo deslocado, zera tarja normal (pra não contaminar total)
+      if (deslocada){
+        state.tarja = null;
+      } else {
+        state.tarja1 = null;
+        state.tarja2 = null;
+      }
+      updateSummary();
+    }
+    chk.addEventListener("change", applyTarjaMode);
+
+    
+    
+    // Toggle material (PE x Sacaria) - aplica regra de densidade em todas as calculadoras
+    const mat = document.getElementById("materialSacaria");
+
+    function closestCalcBlock(el){
+      return el.closest('.subCard') || el.closest('#tarjaSingle') || el.closest('section.card');
+    }
+
+    
+    function updateMaterialBadge(){
+      const badge = document.getElementById("materialBadge");
+      if (!badge) return;
+      const materialSacaria = mat?.checked === true;
+
+      // texto e classe
+      badge.classList.remove("pe","pp","pop","flash");
+      badge.classList.add(materialSacaria ? "pp" : "pe");
+      badge.querySelector("span").textContent = materialSacaria ? "PP" : "PE";
+
+      // animação (reinicia)
+      // força reflow para reativar a animação mesmo em alternâncias rápidas
+      void badge.offsetWidth;
+      badge.classList.add("pop","flash");
+    }
+
+function updateDensityUI(){
+      const materialSacaria = mat?.checked === true;
+
+      // Primeiro: por padrão, no modo Sacaria, desabilita TODOS os campos de densidade (mantém o valor 922 sem precisar apagar)
+      document.querySelectorAll(".dens").forEach(d => {
+        d.disabled = materialSacaria;
+        d.title = materialSacaria ? "Densidade desabilitada no modo Sacaria (PP). Ela só é necessária quando usar espessura." : "";
+      });
+
+      // Exceção: se o usuário estiver usando espessura em algum bloco, habilita a densidade daquele bloco
+      if (materialSacaria){
+        document.querySelectorAll(".esp").forEach(esp => {
+          const v = parseFloat(esp.value);
+          if (v > 0){
+            const block = closestCalcBlock(esp);
+            const dens = block?.querySelector(".dens");
+            if (dens){
+              dens.disabled = false;
+              dens.title = "Densidade necessária porque você informou espessura.";
+            }
+          }
+        });
+      }
+    }
+
+    if (mat){
+      mat.addEventListener("change", () => {
+        updateDensityUI();
+        updateMaterialBadge();
+
+        // Recalcula tudo que já tiver resultado
+        const keys = ["corpo","valvula","tarja","tarja1","tarja2"];
+        const blocks = {
+          corpo: document.querySelector('section[data-part="corpo"]'),
+          valvula: document.querySelector('section[data-part="valvula"]'),
+          tarja: document.querySelector('#tarjaSingle'),
+          tarja1: document.querySelector('#tarjaSplit .subCard[data-subpart="tarja1"]'),
+          tarja2: document.querySelector('#tarjaSplit .subCard[data-subpart="tarja2"]')
+        };
+
+        keys.forEach(k => {
+          if (state[k] && blocks[k]) calcBlock(blocks[k], k);
+        });
+
+        updateSummary();
+      });
+
+      // Quando o usuário digitar espessura no modo Sacaria, a densidade daquele bloco é habilitada automaticamente
+      document.querySelectorAll(".esp").forEach(esp => {
+        esp.addEventListener("input", () => {
+          if (mat.checked) updateDensityUI();
+        });
+      });
+    }
+
+  // Inicial
+    applyTarjaMode();
+    if (typeof updateDensityUI === 'function') updateDensityUI();
+    if (typeof updateMaterialBadge === 'function') updateMaterialBadge();
+  </script>
+
+<script>
+  // PWA: registra Service Worker (cache offline)
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+</script>
+
+</body>
+</html>
